@@ -1,23 +1,26 @@
 $(document).ready(() => {
   let currentPlayer = 'white'
+  let clickState = false;
+  let clickedId = '';
+  const images = {
+    blackpawn: 'pieces/blackpawn.png',
+    whitepawn: 'pieces/whitepawn.png',
+    blackqueen: 'pieces/blackqueen.png',
+    whitequeen: 'pieces/whitequeen.png',
+    blackking: 'pieces/blackking.png',
+    whiteking: 'pieces/whiteking.png',
+    blackbishop: 'pieces/blackbishop.png',
+    whitebishop: 'pieces/whitebishop.png',
+    blackknight: 'pieces/blackknight.png',
+    whiteknight: 'pieces/whiteknight.png',
+    blackrook: 'pieces/blackrook.png',
+    whiterook: 'pieces/whiterook.png'
+  }
   const boardSetup = () => {
     let cellHeightTotal = 8;
     const boardObject = { '1': 'A', '2': 'B', '3': 'C', '4': 'D', '5': 'E',
       '6': 'F', '7': 'G', '8': 'H' }
-    const images = {
-      blackpawn: 'pieces/blackpawn.png',
-      whitepawn: 'pieces/whitepawn.png',
-      blackqueen: 'pieces/blackqueen.png',
-      whitequeen: 'pieces/whitequeen.png',
-      blackking: 'pieces/blackking.png',
-      whiteking: 'pieces/whiteking.png',
-      blackbishop: 'pieces/blackbishop.png',
-      whitebishop: 'pieces/whitebishop.png',
-      blackknight: 'pieces/blackknight.png',
-      whiteknight: 'pieces/whiteknight.png',
-      blackrook: 'pieces/blackrook.png',
-      whiterook: 'pieces/whiterook.png'
-    }
+
     const pieces = [
       'pawn', 'rook', 'queen', 'king', 'bishop', 'knight'
     ]
@@ -107,8 +110,6 @@ $(document).ready(() => {
       queen.textContent = ''
       $(`<img src=${image} />`).appendTo(queen)
     })
-    let clickState = false;
-    let clickedId = '';
     $('.cell').on('click', (e) => {
       if (!clickState) {
         clickedId = e.target.closest('div').id
@@ -153,7 +154,12 @@ $(document).ready(() => {
       alert('no')
       return
     }
-    $(`#${clickedId}`).text('')
+    $(`#${clickedId}`).text(clickedId).removeClass(`owner${currentPlayer} pawn clicked`).addClass('empty')
+    $(`#${targetSpace.id}`).addClass(`owner${currentPlayer} pawn`).removeClass('empty').text('')
+    const image = $(`#${targetSpace.id}`)[0].className.indexOf('ownerblack') > -1 ? images.blackpawn : images.whitepawn
+    $(`<img src=${image} />`).appendTo($(`#${targetSpace.id}`))
+    clickState = false;
+    clickedId = ''
   }
   boardSetup();
 });
