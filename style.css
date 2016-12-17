@@ -1,0 +1,26 @@
+#board {
+  border: 1px black solid;
+  height: 560px;
+  width: 560px;
+  margin: auto;
+}
+
+.cell {
+  width: 68px;
+  height: 68px;
+  border: 1px solid black;
+  float: left;
+  font-size: 20px;
+  text-align: center;
+}
+.whitespace {
+  background-color: white;
+  color: black
+}
+.blackspace {
+  background-color: brown;
+  color: white
+}
+.clicked {
+  background-color: yellow;
+}
