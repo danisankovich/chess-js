@@ -1,4 +1,5 @@
 $(document).ready(() => {
+  let currentPlayer = 'white'
   const boardSetup = () => {
     let cellHeightTotal = 8;
     const boardObject = { '1': 'A', '2': 'B', '3': 'C', '4': 'D', '5': 'E',
@@ -124,12 +125,35 @@ $(document).ready(() => {
           if ($(`#${clickedId}`)[0].className.includes(p)) piece = p
         })
         $(`#${clickedId}`)[0].className.includes('pawn');
-        isValidMove(piece);
+        isValidMove(piece, currentPlayer, clickedId, e.target.closest('div'));
       }
     })
   }
-  const isValidMove = (piece) => {
-    console.log(piece)
+  const isValidMove = (piece, currentPlayer, clickedId, targetSpace) => {
+    const functionByPiece = {
+      pawn: pawnValid(currentPlayer, clickedId, targetSpace),
+      // rook: rookValid(currentPlayer, clickedId),
+      // bishop: bishopValid(currentPlayer, clickedId),
+      // knight: knightValid(currentPlayer, clickedId),
+      // queen: queenValid(currentPlayer, clickedId),
+      // king: kingValid(currentPlayer, clickedId),
+    }
+    functionByPiece[piece]
   };
+  const pawnValid = (currentPlayer, clickedId, targetSpace) => {
+    let currentSpace = clickedId.split('')
+    let targetedSpace = targetSpace
+    if (!targetedSpace.className.includes('empty')) {
+      alert('no')
+      return;
+    }
+    const targetId = targetedSpace.id.split('')
+
+    if (Math.abs(parseInt(currentSpace[1]) - parseInt(targetId[1])) !== 1) {
+      alert('no')
+      return
+    }
+    $(`#${clickedId}`).text('')
+  }
   boardSetup();
 });
