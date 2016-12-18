@@ -134,42 +134,30 @@ $(document).ready(() => {
       }
     })
   }
-
-  const isValidMove = (piece, currPlayer, clickedId, targetSpace) => {
-    const functionByPiece = {
-      pawn: () => (pawnValid(currentPlayer, clickedId, targetSpace)),
-      // rook: rookValid(currentPlayer, clickedId),
-      // bishop: bishopValid(currentPlayer, clickedId),
-      // knight: knightValid(currentPlayer, clickedId),
-      // queen: queenValid(currentPlayer, clickedId),
-      // king: kingValid(currentPlayer, clickedId),
-    }
-    functionByPiece[piece]()
-  };
   const pawnValid = (currPlayer, clickedId, targetSpace) => {
     let currentSpace = clickedId.split('')
     let targetedSpace = targetSpace
     const targetId = targetedSpace.id.split('')
     if (Math.abs(parseInt(currentSpace[1]) - parseInt(targetId[1])) !== 1) {
-      alert('no');
+      alert('invalid move')
       return;
     }
     if (Math.abs(parseInt(currentSpace[1]) - parseInt(targetId[1])) === 1
       && Math.abs(reverseLetter.indexOf(currentSpace[0]) - reverseLetter.indexOf(targetId[0])) > 1) {
-      alert('no')
+      alert('invalid move')
       return
     }
     if ($(`#${targetedSpace.id}`)[0].className.indexOf('empty') > -1 && Math.abs(reverseLetter.indexOf(currentSpace[0]) - reverseLetter.indexOf(targetId[0])) === 1) {
-      alert('nooooo')
+      alert('invalid move')
       return
     } if ($(`#${targetedSpace.id}`)[0].className.indexOf('empty') === -1 && Math.abs(reverseLetter.indexOf(currentSpace[0]) - reverseLetter.indexOf(targetId[0])) === 0) {
-      alert('nooooo')
+      alert('invalid move')
       return
     } else {
-      console.log(currentPlayer)
-      console.log(currentPlayer === 'black')
       const image = currPlayer === 'black' ? images.blackpawn : images.whitepawn;
       $(`#${clickedId}`).text(clickedId).removeClass(`owner${currPlayer} pawn clicked`).addClass('empty')
+      $(`#${clickedId}`).empty()
+
       $(`#${targetSpace.id}`).addClass(`owner${currPlayer} pawn`).removeClass('empty').text('')
       $(`<img src=${image} />`).appendTo($(`#${targetSpace.id}`))
       clickState = false;
@@ -177,5 +165,40 @@ $(document).ready(() => {
       currentPlayer = currPlayer === 'white' ? 'black' :'white'
     }
   }
+  const kingValid = (currPlayer, clickedId, targetSpace) => {
+    let currentSpace = clickedId.split('')
+    let targetedSpace = targetSpace
+    const targetId = targetedSpace.id.split('')
+    if (Math.abs(parseInt(currentSpace[1]) - parseInt(targetId[1])) !== 1) {
+      alert('invalid move')
+      return;
+    }
+    if (Math.abs(parseInt(currentSpace[1]) - parseInt(targetId[1])) === 1
+      && Math.abs(reverseLetter.indexOf(currentSpace[0]) - reverseLetter.indexOf(targetId[0])) > 1) {
+      alert('invalid move')
+      return
+    }
+    else {
+      const image = currPlayer === 'black' ? images.blackking : images.whiteking;
+      $(`#${clickedId}`).text(clickedId).removeClass(`owner${currPlayer} king clicked`).addClass('empty')
+      $(`#${clickedId}`).empty()
+      $(`#${targetSpace.id}`).addClass(`owner${currPlayer} king`).removeClass('empty').text('')
+      $(`<img src=${image} />`).appendTo($(`#${targetSpace.id}`))
+      clickState = false;
+      clickedId = ''
+      currentPlayer = currPlayer === 'white' ? 'black' :'white'
+    }
+  }
+  const isValidMove = (piece, currPlayer, clickedId, targetSpace) => {
+    const functionByPiece = {
+      pawn: () => (pawnValid(currPlayer, clickedId, targetSpace)),
+      // rook: rookValid(currPlayer, clickedId, targetSpace),
+      // bishop: bishopValid(currPlayer, clickedId, targetSpace),
+      // knight: knightValid(currPlayer, clickedId, targetSpace),
+      // queen: queenValid(currPlayer, clickedId, targetSpace),
+      king: () => (kingValid(currPlayer, clickedId, targetSpace)),
+    }
+    functionByPiece[piece]()
+  };
   boardSetup();
 });
