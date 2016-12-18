@@ -16,32 +16,33 @@ $(document).ready(() => {
     blackrook: 'pieces/blackrook.png',
     whiterook: 'pieces/whiterook.png'
   }
+  const boardObject = { '1': 'A', '2': 'B', '3': 'C', '4': 'D', '5': 'E',
+    '6': 'F', '7': 'G', '8': 'H' }
+  const reverseLetter = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
+
+  const pieces = [
+    'pawn', 'rook', 'queen', 'king', 'bishop', 'knight'
+  ]
+  const startingPieces = {
+    'A1': 'rook',
+    'B1': 'bishop',
+    'C1': 'knight',
+    'D1': 'queen',
+    'E1': 'king',
+    'F1': 'bishop',
+    'G1': 'knight',
+    'H1': 'rook',
+    'A8': 'rook',
+    'B8': 'bishop',
+    'C8': 'knight',
+    'D8': 'queen',
+    'E8': 'king',
+    'F8': 'bishop',
+    'G8': 'knight',
+    'H8': 'rook',
+  }
   const boardSetup = () => {
     let cellHeightTotal = 8;
-    const boardObject = { '1': 'A', '2': 'B', '3': 'C', '4': 'D', '5': 'E',
-      '6': 'F', '7': 'G', '8': 'H' }
-
-    const pieces = [
-      'pawn', 'rook', 'queen', 'king', 'bishop', 'knight'
-    ]
-    const startingPieces = {
-      'A1': 'rook',
-      'B1': 'bishop',
-      'C1': 'knight',
-      'D1': 'queen',
-      'E1': 'king',
-      'F1': 'bishop',
-      'G1': 'knight',
-      'H1': 'rook',
-      'A8': 'rook',
-      'B8': 'bishop',
-      'C8': 'knight',
-      'D8': 'queen',
-      'E8': 'king',
-      'F8': 'bishop',
-      'G8': 'knight',
-      'H8': 'rook',
-    }
 
     let color = 'whitespace'
     for (let i = 1; i <= cellHeightTotal; i++) {
@@ -130,36 +131,49 @@ $(document).ready(() => {
       }
     })
   }
-  const isValidMove = (piece, currentPlayer, clickedId, targetSpace) => {
+
+  const isValidMove = (piece, currPlayer, clickedId, targetSpace) => {
+    console.log(currentPlayer)
     const functionByPiece = {
-      pawn: pawnValid(currentPlayer, clickedId, targetSpace),
+      pawn: () => (pawnValid(currentPlayer, clickedId, targetSpace)),
       // rook: rookValid(currentPlayer, clickedId),
       // bishop: bishopValid(currentPlayer, clickedId),
       // knight: knightValid(currentPlayer, clickedId),
       // queen: queenValid(currentPlayer, clickedId),
       // king: kingValid(currentPlayer, clickedId),
     }
-    functionByPiece[piece]
+    functionByPiece[piece]()
   };
-  const pawnValid = (currentPlayer, clickedId, targetSpace) => {
+  const pawnValid = (currPlayer, clickedId, targetSpace) => {
     let currentSpace = clickedId.split('')
     let targetedSpace = targetSpace
-    if (!targetedSpace.className.includes('empty')) {
-      alert('no')
+    const targetId = targetedSpace.id.split('')
+    if (Math.abs(parseInt(currentSpace[1]) - parseInt(targetId[1])) !== 1) {
+      alert('no');
       return;
     }
-    const targetId = targetedSpace.id.split('')
-
-    if (Math.abs(parseInt(currentSpace[1]) - parseInt(targetId[1])) !== 1) {
+    if (Math.abs(parseInt(currentSpace[1]) - parseInt(targetId[1])) === 1
+      && Math.abs(reverseLetter.indexOf(currentSpace[0]) - reverseLetter.indexOf(targetId[0])) > 1) {
       alert('no')
       return
     }
-    $(`#${clickedId}`).text(clickedId).removeClass(`owner${currentPlayer} pawn clicked`).addClass('empty')
-    $(`#${targetSpace.id}`).addClass(`owner${currentPlayer} pawn`).removeClass('empty').text('')
-    const image = $(`#${targetSpace.id}`)[0].className.indexOf('ownerblack') > -1 ? images.blackpawn : images.whitepawn
-    $(`<img src=${image} />`).appendTo($(`#${targetSpace.id}`))
-    clickState = false;
-    clickedId = ''
+    if ($(`#${targetedSpace.id}`)[0].className.indexOf('empty') > -1 && Math.abs(reverseLetter.indexOf(currentSpace[0]) - reverseLetter.indexOf(targetId[0])) === 1) {
+      alert('nooooo')
+      return
+    } if ($(`#${targetedSpace.id}`)[0].className.indexOf('empty') === -1 && Math.abs(reverseLetter.indexOf(currentSpace[0]) - reverseLetter.indexOf(targetId[0])) === 0) {
+      alert('nooooo')
+      return
+    } else {
+      console.log(currentPlayer)
+      console.log(currentPlayer === 'black')
+      const image = currPlayer === 'black' ? images.blackpawn : images.whitepawn;
+      $(`#${clickedId}`).text(clickedId).removeClass(`owner${currPlayer} pawn clicked`).addClass('empty')
+      $(`#${targetSpace.id}`).addClass(`owner${currPlayer} pawn`).removeClass('empty').text('')
+      $(`<img src=${image} />`).appendTo($(`#${targetSpace.id}`))
+      clickState = false;
+      clickedId = ''
+      currentPlayer = currPlayer === 'white' ? 'black' :'white'
+    }
   }
   boardSetup();
 });
