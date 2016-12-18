@@ -113,6 +113,9 @@ $(document).ready(() => {
     })
     $('.cell').on('click', (e) => {
       if (!clickState) {
+        if (e.target.closest('div').className.indexOf(`owner${currentPlayer}`)  === -1) {
+          return
+        }
         clickedId = e.target.closest('div').id
         $(`#${clickedId}`).addClass('clicked');
         clickState = true;
@@ -133,7 +136,6 @@ $(document).ready(() => {
   }
 
   const isValidMove = (piece, currPlayer, clickedId, targetSpace) => {
-    console.log(currentPlayer)
     const functionByPiece = {
       pawn: () => (pawnValid(currentPlayer, clickedId, targetSpace)),
       // rook: rookValid(currentPlayer, clickedId),
