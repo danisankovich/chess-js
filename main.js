@@ -158,7 +158,9 @@ $(document).ready(() => {
       $(`#${clickedId}`).text(clickedId).removeClass(`owner${currPlayer} pawn clicked`).addClass('empty')
       $(`#${clickedId}`).empty()
 
-      $(`#${targetSpace.id}`).addClass(`owner${currPlayer} pawn`).removeClass('empty').text('')
+      $(`#${targetSpace.id}`)
+        .removeClass(`owner${currPlayer === 'white' ? 'black' : 'white'} empty pawn knight queen king rook bishop`)
+        .addClass(`owner${currPlayer} pawn`).text('')
       $(`<img src=${image} />`).appendTo($(`#${targetSpace.id}`))
       clickState = false;
       clickedId = ''
@@ -182,7 +184,31 @@ $(document).ready(() => {
       const image = currPlayer === 'black' ? images.blackking : images.whiteking;
       $(`#${clickedId}`).text(clickedId).removeClass(`owner${currPlayer} king clicked`).addClass('empty')
       $(`#${clickedId}`).empty()
-      $(`#${targetSpace.id}`).addClass(`owner${currPlayer} king`).removeClass('empty').text('')
+      $(`#${targetSpace.id}`)
+        .removeClass(`owner${currPlayer === 'white' ? 'black' : 'white'} empty pawn knight queen king rook bishop`)
+        .addClass(`owner${currPlayer} king`).text('')
+      $(`<img src=${image} />`).appendTo($(`#${targetSpace.id}`))
+      clickState = false;
+      clickedId = ''
+      currentPlayer = currPlayer === 'white' ? 'black' :'white'
+    }
+  }
+  const rookValid = (currPlayer, clickedId, targetSpace) => {
+    let currentSpace = clickedId.split('')
+    let targetedSpace = targetSpace
+    const targetId = targetedSpace.id.split('')
+    console.log(currentSpace, targetId)
+    if (currentSpace[0] !== targetId[0] && currentSpace[1] !== targetId[1]) {
+      alert('invalid move')
+      return;
+    }
+    else {
+      const image = currPlayer === 'black' ? images.blackrook : images.whiterook;
+      $(`#${clickedId}`).text(clickedId).removeClass(`owner${currPlayer} rook clicked`).addClass('empty')
+      $(`#${clickedId}`).empty()
+      $(`#${targetSpace.id}`)
+        .removeClass(`owner${currPlayer === 'white' ? 'black' : 'white'} empty pawn knight queen king rook bishop`)
+        .addClass(`owner${currPlayer} rook`).text('')
       $(`<img src=${image} />`).appendTo($(`#${targetSpace.id}`))
       clickState = false;
       clickedId = ''
@@ -192,7 +218,7 @@ $(document).ready(() => {
   const isValidMove = (piece, currPlayer, clickedId, targetSpace) => {
     const functionByPiece = {
       pawn: () => (pawnValid(currPlayer, clickedId, targetSpace)),
-      // rook: rookValid(currPlayer, clickedId, targetSpace),
+      rook: () => (rookValid(currPlayer, clickedId, targetSpace)),
       // bishop: bishopValid(currPlayer, clickedId, targetSpace),
       // knight: knightValid(currPlayer, clickedId, targetSpace),
       // queen: queenValid(currPlayer, clickedId, targetSpace),
