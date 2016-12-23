@@ -197,7 +197,6 @@ $(document).ready(() => {
     let currentSpace = clickedId.split('')
     let targetedSpace = targetSpace
     const targetId = targetedSpace.id.split('')
-    console.log(currentSpace, targetId)
     if (currentSpace[0] !== targetId[0] && currentSpace[1] !== targetId[1]) {
       alert('invalid move')
       return;
@@ -215,6 +214,7 @@ $(document).ready(() => {
       currentPlayer = currPlayer === 'white' ? 'black' :'white'
     }
   }
+
   const isValidMove = (piece, currPlayer, clickedId, targetSpace) => {
     const functionByPiece = {
       pawn: () => (pawnValid(currPlayer, clickedId, targetSpace)),
