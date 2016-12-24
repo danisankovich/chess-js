@@ -25,8 +25,8 @@ $(document).ready(() => {
   ]
   const startingPieces = {
     'A1': 'rook',
-    'B1': 'bishop',
-    'C1': 'knight',
+    'B1': 'knight',
+    'C1': 'bishop',
     'D1': 'queen',
     'E1': 'king',
     'F1': 'bishop',
@@ -76,8 +76,8 @@ $(document).ready(() => {
       $(`<img src=${image} />`).appendTo(obj)
     })
     const rooks = ['A1', 'H1', 'A8', 'H8']
-    const bishops = ['B1', 'G1', 'B8', 'G8']
-    const knights = ['C1', 'F1', 'C8', 'F8']
+    const bishops = ['C1', 'F1', 'C8', 'F8']
+    const knights = ['B1', 'G1', 'B8', 'G8']
     const kings = ['E1', 'E8']
     const queens = ['D1', 'D8']
     rooks.forEach((id) => {
@@ -214,12 +214,91 @@ $(document).ready(() => {
       currentPlayer = currPlayer === 'white' ? 'black' :'white'
     }
   }
-
+  const bishopValid = (currPlayer, clickedId, targetSpace) => {
+    let currentSpace = clickedId.split('')
+    let targetedSpace = targetSpace
+    const targetId = targetedSpace.id.split('')
+    const value = bishopChecker(currPlayer, clickedId, targetSpace);
+    if (value) {
+      const image = currPlayer === 'black' ? images.blackbishop : images.whitebishop;
+      $(`#${clickedId}`).text(clickedId).removeClass(`owner${currPlayer} bishop clicked`).addClass('empty')
+      $(`#${clickedId}`).empty()
+      $(`#${targetSpace.id}`)
+        .removeClass(`owner${currPlayer === 'white' ? 'black' : 'white'} empty pawn knight queen king rook bishop`)
+        .addClass(`owner${currPlayer} bishop`).text('')
+      $(`<img src=${image} />`).appendTo($(`#${targetSpace.id}`))
+      clickState = false;
+      clickedId = ''
+      currentPlayer = currPlayer === 'white' ? 'black' :'white'
+    }
+  }
+  const bishopChecker = (currPlayer, clickedId, targetSpace) => {
+    let currentSpace = clickedId.split('')
+    let targetedSpace = targetSpace
+    const targetId = targetedSpace.id.split('')
+    if (currentSpace[0] === targetId[0] || currentSpace[1] === targetId[1]) {
+      alert('invalid move')
+      return;
+    }
+    if (Math.abs(
+      reverseLetter.indexOf(currentSpace[0]) - reverseLetter.indexOf(targetId[0])) !==
+      Math.abs(parseInt(currentSpace[1]) - parseInt(targetId[1]))) {
+        alert('invalid move')
+        return;
+    }
+    let pass = noBlockers(currentSpace, targetId, 'bishop')
+    if (!pass) {
+      alert('invalid move')
+      return
+    }
+    return true;
+  }
+  const noBlockers = (currentSpace, targetId, piece) => {
+    const startLetter = currentSpace[0];
+    const startLetterIndex = reverseLetter.indexOf(startLetter);
+    const endLetter = targetId[0];
+    const endLetterIndex = reverseLetter.indexOf(endLetter);
+    const startNumber = parseInt(currentSpace[1])
+    const endNumber = parseInt(targetId[1]);
+    const leftRight = startLetterIndex > endLetterIndex ? 'left' : 'right';
+    validMove = true;
+    if (piece === 'bishop') {
+      if (startNumber > endNumber) {
+        let numberTracker = startNumber;
+        let letterTracker = startLetterIndex;
+        while (numberTracker !== endNumber) {
+          numberTracker--
+          letterTracker -= leftRight === 'left' ? 1 : -1;
+          if (
+            numberTracker !== startNumber
+            && $(`#${reverseLetter[letterTracker]}${numberTracker}`)[0].className.split(' ').indexOf('empty') === -1
+            && numberTracker !== endNumber) {
+              validMove = false;
+          }
+        }
+      }
+      if (startNumber < endNumber) {
+        let numberTracker = startNumber;
+        let letterTracker = startLetterIndex;
+        while (numberTracker !== endNumber) {
+          numberTracker++
+          letterTracker -= leftRight === 'left' ? 1 : -1;
+          if (
+            numberTracker !== startNumber
+            && $(`#${reverseLetter[letterTracker]}${numberTracker}`)[0].className.split(' ').indexOf('empty') === -1
+            && numberTracker !== endNumber) {
+              validMove = false;
+          }
+        }
+      }
+    }
+    return validMove
+  }
   const isValidMove = (piece, currPlayer, clickedId, targetSpace) => {
     const functionByPiece = {
       pawn: () => (pawnValid(currPlayer, clickedId, targetSpace)),
       rook: () => (rookValid(currPlayer, clickedId, targetSpace)),
-      // bishop: bishopValid(currPlayer, clickedId, targetSpace),
+      bishop: () => (bishopValid(currPlayer, clickedId, targetSpace)),
       // knight: knightValid(currPlayer, clickedId, targetSpace),
       // queen: queenValid(currPlayer, clickedId, targetSpace),
       king: () => (kingValid(currPlayer, clickedId, targetSpace)),
