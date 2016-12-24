@@ -273,8 +273,6 @@ $(document).ready(() => {
         let letterTracker = startLetterIndex;
         while (letterTracker !== endLetterIndex) {
           letterTracker++
-          console.log('lasdkfjokafjs')
-          console.log($(`#${reverseLetter[letterTracker]}${numberTracker}`)[0].className)
           if ($(`#${reverseLetter[letterTracker]}${numberTracker}`)[0].className.split(' ').indexOf('empty') === -1) {
             validMove = false;
           }
