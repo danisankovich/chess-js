@@ -147,11 +147,10 @@ $(document).ready(() => {
       alert('invalid move')
       return
     }
-    if (currentPlayer === 'white' && (parseInt(currentSpace[1]) < parseInt(targetId[1]))) {
-      alert('invalid move')
-      return
-    }
-    if (currentPlayer === 'black' && (parseInt(currentSpace[1]) > parseInt(targetId[1]))) {
+    if (
+      currentPlayer === 'white' && (parseInt(currentSpace[1]) < parseInt(targetId[1]))
+      ||currentPlayer === 'black' && (parseInt(currentSpace[1]) > parseInt(targetId[1]))
+    ) {
       alert('invalid move')
       return
     }
@@ -165,7 +164,6 @@ $(document).ready(() => {
       const image = currPlayer === 'black' ? images.blackpawn : images.whitepawn;
       $(`#${clickedId}`).text(clickedId).removeClass(`owner${currPlayer} pawn clicked`).addClass('empty')
       $(`#${clickedId}`).empty()
-
       $(`#${targetSpace.id}`)
         .removeClass(`owner${currPlayer === 'white' ? 'black' : 'white'} empty pawn knight queen king rook bishop`)
         .addClass(`owner${currPlayer} pawn`).text('')
@@ -209,7 +207,8 @@ $(document).ready(() => {
       alert('invalid move')
       return;
     }
-    else {
+    const pass = noBlockersRook(currentSpace, targetId, 'rook')
+    if (pass) {
       const image = currPlayer === 'black' ? images.blackrook : images.whiterook;
       $(`#${clickedId}`).text(clickedId).removeClass(`owner${currPlayer} rook clicked`).addClass('empty')
       $(`#${clickedId}`).empty()
@@ -220,7 +219,69 @@ $(document).ready(() => {
       clickState = false;
       clickedId = ''
       currentPlayer = currPlayer === 'white' ? 'black' :'white'
+    } else {
+      alert('invalid move')
+      return
     }
+  }
+  const noBlockersRook = (currentSpace, targetId, piece) => {
+    const startLetter = currentSpace[0];
+    const startLetterIndex = reverseLetter.indexOf(startLetter);
+    const endLetter = targetId[0];
+    const endLetterIndex = reverseLetter.indexOf(endLetter);
+    const startNumber = parseInt(currentSpace[1])
+    const endNumber = parseInt(targetId[1]);
+    const leftRight = startLetterIndex > endLetterIndex ? 'left' : 'right';
+    let validMove = true;
+    if (piece === 'rook') {
+      if (startNumber > endNumber) {
+        let numberTracker = startNumber;
+        while (numberTracker !== endNumber) {
+          numberTracker--
+          if (
+            numberTracker !== startNumber
+            && $(`#${reverseLetter[startLetterIndex]}${numberTracker}`)[0].className.split(' ').indexOf('empty') === -1
+            && numberTracker !== endNumber) {
+              validMove = false;
+          }
+        }
+      }
+      if (startNumber < endNumber) {
+        let numberTracker = startNumber;
+        while (numberTracker !== endNumber) {
+          numberTracker++
+          if (
+            numberTracker !== startNumber
+            && $(`#${reverseLetter[startLetterIndex]}${numberTracker}`)[0].className.split(' ').indexOf('empty') === -1
+            && numberTracker !== endNumber) {
+              validMove = false;
+          }
+        }
+      }
+      if (startLetterIndex > endLetterIndex) {
+        let numberTracker = startNumber;
+        let letterTracker = startLetterIndex
+        while (letterTracker !== endLetterIndex) {
+          letterTracker--
+          if ($(`#${reverseLetter[letterTracker]}${numberTracker}`)[0].className.split(' ').indexOf('empty') === -1) {
+            validMove = false;
+          }
+        }
+      }
+      if (startLetterIndex < endLetterIndex) {
+        let numberTracker = startNumber;
+        let letterTracker = startLetterIndex;
+        while (letterTracker !== endLetterIndex) {
+          letterTracker++
+          console.log('lasdkfjokafjs')
+          console.log($(`#${reverseLetter[letterTracker]}${numberTracker}`)[0].className)
+          if ($(`#${reverseLetter[letterTracker]}${numberTracker}`)[0].className.split(' ').indexOf('empty') === -1) {
+            validMove = false;
+          }
+        }
+      }
+    }
+    return validMove
   }
   const bishopValid = (currPlayer, clickedId, targetSpace) => {
     let currentSpace = clickedId.split('')
@@ -254,14 +315,14 @@ $(document).ready(() => {
         alert('invalid move')
         return;
     }
-    let pass = noBlockers(currentSpace, targetId, 'bishop')
+    let pass = noBlockersBishop(currentSpace, targetId, 'bishop')
     if (!pass) {
       alert('invalid move')
       return
     }
     return true;
   }
-  const noBlockers = (currentSpace, targetId, piece) => {
+  const noBlockersBishop = (currentSpace, targetId, piece) => {
     const startLetter = currentSpace[0];
     const startLetterIndex = reverseLetter.indexOf(startLetter);
     const endLetter = targetId[0];
@@ -302,6 +363,9 @@ $(document).ready(() => {
     }
     return validMove
   }
+  const queenValid = () => {
+    // mix of rook and bishop.
+  }
   const isValidMove = (piece, currPlayer, clickedId, targetSpace) => {
     if (targetSpace.className.indexOf(`owner${currentPlayer}`) > -1) {
       alert('invalid move')
@@ -312,7 +376,7 @@ $(document).ready(() => {
       rook: () => (rookValid(currPlayer, clickedId, targetSpace)),
       bishop: () => (bishopValid(currPlayer, clickedId, targetSpace)),
       // knight: knightValid(currPlayer, clickedId, targetSpace),
-      // queen: queenValid(currPlayer, clickedId, targetSpace),
+      queen: () => (queenValid(currPlayer, clickedId, targetSpace)),
       king: () => (kingValid(currPlayer, clickedId, targetSpace)),
     }
     functionByPiece[piece]()
