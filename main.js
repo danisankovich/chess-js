@@ -147,6 +147,14 @@ $(document).ready(() => {
       alert('invalid move')
       return
     }
+    if (currentPlayer === 'white' && (parseInt(currentSpace[1]) < parseInt(targetId[1]))) {
+      alert('invalid move')
+      return
+    }
+    if (currentPlayer === 'black' && (parseInt(currentSpace[1]) > parseInt(targetId[1]))) {
+      alert('invalid move')
+      return
+    }
     if ($(`#${targetedSpace.id}`)[0].className.indexOf('empty') > -1 && Math.abs(reverseLetter.indexOf(currentSpace[0]) - reverseLetter.indexOf(targetId[0])) === 1) {
       alert('invalid move')
       return
@@ -295,6 +303,10 @@ $(document).ready(() => {
     return validMove
   }
   const isValidMove = (piece, currPlayer, clickedId, targetSpace) => {
+    if (targetSpace.className.indexOf(`owner${currentPlayer}`) > -1) {
+      alert('invalid move')
+      return
+    }
     const functionByPiece = {
       pawn: () => (pawnValid(currPlayer, clickedId, targetSpace)),
       rook: () => (rookValid(currPlayer, clickedId, targetSpace)),
