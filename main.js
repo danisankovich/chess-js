@@ -199,7 +199,7 @@ $(document).ready(() => {
       currentPlayer = currPlayer === 'white' ? 'black' :'white'
     }
   }
-  const rookValid = (currPlayer, clickedId, targetSpace) => {
+  const rookValid = (currPlayer, clickedId, targetSpace, piece) => {
     let currentSpace = clickedId.split('')
     let targetedSpace = targetSpace
     const targetId = targetedSpace.id.split('')
@@ -209,12 +209,17 @@ $(document).ready(() => {
     }
     const pass = noBlockersRook(currentSpace, targetId)
     if (pass) {
-      const image = currPlayer === 'black' ? images.blackrook : images.whiterook;
-      $(`#${clickedId}`).text(clickedId).removeClass(`owner${currPlayer} rook clicked`).addClass('empty')
+      let image;
+      if (piece === 'rook') {
+        image = currPlayer === 'black' ? images.blackrook : images.whiterook;
+      } if (piece === 'queen') {
+        image = currPlayer === 'black' ? images.blackqueen : images.whitequeen;
+      }
+      $(`#${clickedId}`).text(clickedId).removeClass(`owner${currPlayer} ${piece} clicked`).addClass('empty')
       $(`#${clickedId}`).empty()
       $(`#${targetSpace.id}`)
         .removeClass(`owner${currPlayer === 'white' ? 'black' : 'white'} empty pawn knight queen king rook bishop`)
-        .addClass(`owner${currPlayer} rook`).text('')
+        .addClass(`owner${currPlayer} ${piece}`).text('')
       $(`<img src=${image} />`).appendTo($(`#${targetSpace.id}`))
       clickState = false;
       clickedId = ''
@@ -286,18 +291,23 @@ $(document).ready(() => {
     }
     return validMove
   }
-  const bishopValid = (currPlayer, clickedId, targetSpace) => {
+  const bishopValid = (currPlayer, clickedId, targetSpace, piece) => {
     let currentSpace = clickedId.split('')
     let targetedSpace = targetSpace
     const targetId = targetedSpace.id.split('')
     const value = bishopChecker(currPlayer, clickedId, targetSpace);
     if (value) {
-      const image = currPlayer === 'black' ? images.blackbishop : images.whitebishop;
-      $(`#${clickedId}`).text(clickedId).removeClass(`owner${currPlayer} bishop clicked`).addClass('empty')
+      let image;
+      if (piece === 'bishop') {
+        image = currPlayer === 'black' ? images.blackbishop : images.whitebishop;
+      } if (piece === 'queen') {
+        image = currPlayer === 'black' ? images.blackqueen : images.whitequeen;
+      }
+      $(`#${clickedId}`).text(clickedId).removeClass(`owner${currPlayer} ${piece} clicked`).addClass('empty')
       $(`#${clickedId}`).empty()
       $(`#${targetSpace.id}`)
         .removeClass(`owner${currPlayer === 'white' ? 'black' : 'white'} empty pawn knight queen king rook bishop`)
-        .addClass(`owner${currPlayer} bishop`).text('')
+        .addClass(`owner${currPlayer} ${piece}`).text('')
       $(`<img src=${image} />`).appendTo($(`#${targetSpace.id}`))
       clickState = false;
       clickedId = ''
@@ -364,14 +374,14 @@ $(document).ready(() => {
     }
     return validMove
   }
-  const queenValid = (currPlayer, clickedId, targetSpace) => {
+  const queenValid = (currPlayer, clickedId, targetSpace, piece) => {
     let currentSpace = clickedId.split('')
     let targetedSpace = targetSpace
     const targetId = targetedSpace.id.split('')
     if (currentSpace[0] === targetId[0] || currentSpace[1] === targetId[1]) {
-      rookValid(currPlayer, clickedId, targetSpace)
+      rookValid(currPlayer, clickedId, targetSpace, 'queen')
     } else {
-      bishopValid(currPlayer, clickedId, targetSpace)
+      bishopValid(currPlayer, clickedId, targetSpace, 'queen')
     }
   }
   const isValidMove = (piece, currPlayer, clickedId, targetSpace) => {
@@ -381,10 +391,10 @@ $(document).ready(() => {
     }
     const functionByPiece = {
       pawn: () => (pawnValid(currPlayer, clickedId, targetSpace)),
-      rook: () => (rookValid(currPlayer, clickedId, targetSpace)),
-      bishop: () => (bishopValid(currPlayer, clickedId, targetSpace)),
+      rook: () => (rookValid(currPlayer, clickedId, targetSpace, 'rook')),
+      bishop: () => (bishopValid(currPlayer, clickedId, targetSpace, 'bishop')),
       // knight: knightValid(currPlayer, clickedId, targetSpace),
-      queen: () => (queenValid(currPlayer, clickedId, targetSpace)),
+      queen: () => (queenValid(currPlayer, clickedId, targetSpace, 'queen')),
       king: () => (kingValid(currPlayer, clickedId, targetSpace)),
     }
     functionByPiece[piece]()
