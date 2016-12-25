@@ -207,7 +207,7 @@ $(document).ready(() => {
       alert('invalid move')
       return;
     }
-    const pass = noBlockersRook(currentSpace, targetId, 'rook')
+    const pass = noBlockersRook(currentSpace, targetId)
     if (pass) {
       const image = currPlayer === 'black' ? images.blackrook : images.whiterook;
       $(`#${clickedId}`).text(clickedId).removeClass(`owner${currPlayer} rook clicked`).addClass('empty')
@@ -224,7 +224,7 @@ $(document).ready(() => {
       return
     }
   }
-  const noBlockersRook = (currentSpace, targetId, piece) => {
+  const noBlockersRook = (currentSpace, targetId) => {
     const startLetter = currentSpace[0];
     const startLetterIndex = reverseLetter.indexOf(startLetter);
     const endLetter = targetId[0];
@@ -233,49 +233,54 @@ $(document).ready(() => {
     const endNumber = parseInt(targetId[1]);
     const leftRight = startLetterIndex > endLetterIndex ? 'left' : 'right';
     let validMove = true;
-    if (piece === 'rook') {
-      if (startNumber > endNumber) {
-        let numberTracker = startNumber;
-        while (numberTracker !== endNumber) {
-          numberTracker--
-          if (
-            numberTracker !== startNumber
-            && $(`#${reverseLetter[startLetterIndex]}${numberTracker}`)[0].className.split(' ').indexOf('empty') === -1
-            && numberTracker !== endNumber) {
-              validMove = false;
-          }
-        }
-      }
-      if (startNumber < endNumber) {
-        let numberTracker = startNumber;
-        while (numberTracker !== endNumber) {
-          numberTracker++
-          if (
-            numberTracker !== startNumber
-            && $(`#${reverseLetter[startLetterIndex]}${numberTracker}`)[0].className.split(' ').indexOf('empty') === -1
-            && numberTracker !== endNumber) {
-              validMove = false;
-          }
-        }
-      }
-      if (startLetterIndex > endLetterIndex) {
-        let numberTracker = startNumber;
-        let letterTracker = startLetterIndex
-        while (letterTracker !== endLetterIndex) {
-          letterTracker--
-          if ($(`#${reverseLetter[letterTracker]}${numberTracker}`)[0].className.split(' ').indexOf('empty') === -1) {
+    if (startNumber > endNumber) {
+      let numberTracker = startNumber;
+      while (numberTracker !== endNumber) {
+        numberTracker--
+        if (
+          numberTracker !== startNumber
+          && $(`#${reverseLetter[startLetterIndex]}${numberTracker}`)[0].className.split(' ').indexOf('empty') === -1
+          && numberTracker !== endNumber) {
             validMove = false;
-          }
         }
       }
-      if (startLetterIndex < endLetterIndex) {
-        let numberTracker = startNumber;
-        let letterTracker = startLetterIndex;
-        while (letterTracker !== endLetterIndex) {
-          letterTracker++
-          if ($(`#${reverseLetter[letterTracker]}${numberTracker}`)[0].className.split(' ').indexOf('empty') === -1) {
+    }
+    if (startNumber < endNumber) {
+      let numberTracker = startNumber;
+      while (numberTracker !== endNumber) {
+        numberTracker++
+        if (
+          numberTracker !== startNumber
+          && $(`#${reverseLetter[startLetterIndex]}${numberTracker}`)[0].className.split(' ').indexOf('empty') === -1
+          && numberTracker !== endNumber) {
             validMove = false;
-          }
+        }
+      }
+    }
+    if (startLetterIndex > endLetterIndex) {
+      let numberTracker = startNumber;
+      let letterTracker = startLetterIndex
+      while (letterTracker !== endLetterIndex) {
+        letterTracker--
+        if (letterTracker !== startLetterIndex
+          && $(`#${reverseLetter[letterTracker]}${numberTracker}`)[0].className.split(' ').indexOf('empty') === -1
+          && letterTracker !== endLetterIndex
+        ) {
+          validMove = false;
+        }
+      }
+    }
+    if (startLetterIndex < endLetterIndex) {
+      let numberTracker = startNumber;
+      let letterTracker = startLetterIndex;
+      while (letterTracker !== endLetterIndex) {
+        letterTracker++
+        if (
+          letterTracker !== startLetterIndex
+          && $(`#${reverseLetter[letterTracker]}${numberTracker}`)[0].className.split(' ').indexOf('empty') === -1
+          && letterTracker !== endLetterIndex
+        ) {
+          validMove = false;
         }
       }
     }
@@ -313,14 +318,14 @@ $(document).ready(() => {
         alert('invalid move')
         return;
     }
-    let pass = noBlockersBishop(currentSpace, targetId, 'bishop')
+    let pass = noBlockersBishop(currentSpace, targetId)
     if (!pass) {
       alert('invalid move')
       return
     }
     return true;
   }
-  const noBlockersBishop = (currentSpace, targetId, piece) => {
+  const noBlockersBishop = (currentSpace, targetId) => {
     const startLetter = currentSpace[0];
     const startLetterIndex = reverseLetter.indexOf(startLetter);
     const endLetter = targetId[0];
@@ -329,40 +334,45 @@ $(document).ready(() => {
     const endNumber = parseInt(targetId[1]);
     const leftRight = startLetterIndex > endLetterIndex ? 'left' : 'right';
     validMove = true;
-    if (piece === 'bishop') {
-      if (startNumber > endNumber) {
-        let numberTracker = startNumber;
-        let letterTracker = startLetterIndex;
-        while (numberTracker !== endNumber) {
-          numberTracker--
-          letterTracker -= leftRight === 'left' ? 1 : -1;
-          if (
-            numberTracker !== startNumber
-            && $(`#${reverseLetter[letterTracker]}${numberTracker}`)[0].className.split(' ').indexOf('empty') === -1
-            && numberTracker !== endNumber) {
-              validMove = false;
-          }
+    if (startNumber > endNumber) {
+      let numberTracker = startNumber;
+      let letterTracker = startLetterIndex;
+      while (numberTracker !== endNumber) {
+        numberTracker--
+        letterTracker -= leftRight === 'left' ? 1 : -1;
+        if (
+          numberTracker !== startNumber
+          && $(`#${reverseLetter[letterTracker]}${numberTracker}`)[0].className.split(' ').indexOf('empty') === -1
+          && numberTracker !== endNumber) {
+            validMove = false;
         }
       }
-      if (startNumber < endNumber) {
-        let numberTracker = startNumber;
-        let letterTracker = startLetterIndex;
-        while (numberTracker !== endNumber) {
-          numberTracker++
-          letterTracker -= leftRight === 'left' ? 1 : -1;
-          if (
-            numberTracker !== startNumber
-            && $(`#${reverseLetter[letterTracker]}${numberTracker}`)[0].className.split(' ').indexOf('empty') === -1
-            && numberTracker !== endNumber) {
-              validMove = false;
-          }
+    }
+    if (startNumber < endNumber) {
+      let numberTracker = startNumber;
+      let letterTracker = startLetterIndex;
+      while (numberTracker !== endNumber) {
+        numberTracker++
+        letterTracker -= leftRight === 'left' ? 1 : -1;
+        if (
+          numberTracker !== startNumber
+          && $(`#${reverseLetter[letterTracker]}${numberTracker}`)[0].className.split(' ').indexOf('empty') === -1
+          && numberTracker !== endNumber) {
+            validMove = false;
         }
       }
     }
     return validMove
   }
-  const queenValid = () => {
-    // mix of rook and bishop.
+  const queenValid = (currPlayer, clickedId, targetSpace) => {
+    let currentSpace = clickedId.split('')
+    let targetedSpace = targetSpace
+    const targetId = targetedSpace.id.split('')
+    if (currentSpace[0] === targetId[0] || currentSpace[1] === targetId[1]) {
+      rookValid(currPlayer, clickedId, targetSpace)
+    } else {
+      bishopValid(currPlayer, clickedId, targetSpace)
+    }
   }
   const isValidMove = (piece, currPlayer, clickedId, targetSpace) => {
     if (targetSpace.className.indexOf(`owner${currentPlayer}`) > -1) {
