@@ -2,6 +2,8 @@ $(document).ready(() => {
   let currentPlayer = 'white'
   let clickState = false;
   let clickedId = '';
+  let inCheckBlack = false;
+  let inCheckWhite = false
   const images = {
     blackpawn: 'pieces/blackpawn.png',
     whitepawn: 'pieces/whitepawn.png',
@@ -19,7 +21,6 @@ $(document).ready(() => {
   const boardObject = { '1': 'A', '2': 'B', '3': 'C', '4': 'D', '5': 'E',
     '6': 'F', '7': 'G', '8': 'H' }
   const reverseLetter = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
-
   const pieces = [
     'pawn', 'rook', 'queen', 'king', 'bishop', 'knight'
   ]
@@ -33,8 +34,8 @@ $(document).ready(() => {
     'G1': 'knight',
     'H1': 'rook',
     'A8': 'rook',
-    'B8': 'bishop',
-    'C8': 'knight',
+    'B8': 'knight',
+    'C8': 'bishop',
     'D8': 'queen',
     'E8': 'king',
     'F8': 'bishop',
@@ -130,106 +131,131 @@ $(document).ready(() => {
           if ($(`#${clickedId}`)[0].className.includes(p)) piece = p
         })
         $(`#${clickedId}`)[0].className.includes('pawn');
-        isValidMove(piece, currentPlayer, clickedId, e.target.closest('div'));
+        isValidMove(piece, clickedId, e.target.closest('div'));
       }
     })
   }
-  const pawnValid = (currPlayer, clickedId, targetSpace) => {
+  const pawnValid = (clickedId, targetSpace, checkCheck = false) => {
+    const piece = 'pawn'
     let currentSpace = clickedId.split('')
     let targetedSpace = targetSpace
     const targetId = targetedSpace.id.split('')
     if (Math.abs(parseInt(currentSpace[1]) - parseInt(targetId[1])) !== 1) {
-      alert('invalid move')
+      if (!checkCheck) alert('invalid move')
       return;
     }
     if (Math.abs(parseInt(currentSpace[1]) - parseInt(targetId[1])) === 1
       && Math.abs(reverseLetter.indexOf(currentSpace[0]) - reverseLetter.indexOf(targetId[0])) > 1) {
-      alert('invalid move')
-      return
+        if (!checkCheck) alert('invalid move')
+      return;
     }
     if (
       currentPlayer === 'white' && (parseInt(currentSpace[1]) < parseInt(targetId[1]))
       ||currentPlayer === 'black' && (parseInt(currentSpace[1]) > parseInt(targetId[1]))
     ) {
-      alert('invalid move')
-      return
+      if (!checkCheck) alert('invalid move')
+      return;
     }
     if ($(`#${targetedSpace.id}`)[0].className.indexOf('empty') > -1 && Math.abs(reverseLetter.indexOf(currentSpace[0]) - reverseLetter.indexOf(targetId[0])) === 1) {
-      alert('invalid move')
-      return
+      if (!checkCheck) alert('invalid move')
+      return;
     } if ($(`#${targetedSpace.id}`)[0].className.indexOf('empty') === -1 && Math.abs(reverseLetter.indexOf(currentSpace[0]) - reverseLetter.indexOf(targetId[0])) === 0) {
-      alert('invalid move')
-      return
+      if (!checkCheck) alert('invalid move')
+      return;
     } else {
-      const image = currPlayer === 'black' ? images.blackpawn : images.whitepawn;
-      $(`#${clickedId}`).text(clickedId).removeClass(`owner${currPlayer} pawn clicked`).addClass('empty')
-      $(`#${clickedId}`).empty()
-      $(`#${targetSpace.id}`)
-        .removeClass(`owner${currPlayer === 'white' ? 'black' : 'white'} empty pawn knight queen king rook bishop`)
-        .addClass(`owner${currPlayer} pawn`).text('')
-      $(`<img src=${image} />`).appendTo($(`#${targetSpace.id}`))
-      clickState = false;
-      clickedId = ''
-      currentPlayer = currPlayer === 'white' ? 'black' :'white'
+      const image = currentPlayer === 'black' ? images.blackpawn : images.whitepawn;
+      if (!checkCheck) {
+        $(`#${clickedId}`).text(clickedId).removeClass(`owner${currentPlayer} pawn clicked`).addClass('empty')
+        $(`#${clickedId}`).empty()
+        $(`#${targetSpace.id}`)
+          .removeClass(`owner${currentPlayer === 'white' ? 'black' : 'white'} empty pawn knight queen king rook bishop`)
+          .addClass(`owner${currentPlayer} pawn`).text('')
+        $(`<img src=${image} />`).appendTo($(`#${targetSpace.id}`))
+        checkChecker('pawn', targetId);
+        clickState = false;
+        clickedId = ''
+        currentPlayer = swapCurrentPlayer();
+      } else {
+        if (currentPlayer === 'white') inCheckBlack = true;
+        if (currentPlayer === 'black') inCheckWhite = true;
+        return { inCheckBlack, inCheckWhite }
+      }
     }
   }
-  const kingValid = (currPlayer, clickedId, targetSpace) => {
+  const kingValid = (clickedId, targetSpace, checkCheck = false) => {
     let currentSpace = clickedId.split('')
     let targetedSpace = targetSpace
     const targetId = targetedSpace.id.split('')
     if (Math.abs(parseInt(currentSpace[1]) - parseInt(targetId[1])) !== 1) {
-      alert('invalid move')
+      if (!checkCheck) alert('invalid move')
       return;
     }
     if (Math.abs(parseInt(currentSpace[1]) - parseInt(targetId[1])) === 1
       && Math.abs(reverseLetter.indexOf(currentSpace[0]) - reverseLetter.indexOf(targetId[0])) > 1) {
-      alert('invalid move')
-      return
+        if (!checkCheck) alert('invalid move')
+      return;
     }
     else {
-      const image = currPlayer === 'black' ? images.blackking : images.whiteking;
-      $(`#${clickedId}`).text(clickedId).removeClass(`owner${currPlayer} king clicked`).addClass('empty')
-      $(`#${clickedId}`).empty()
-      $(`#${targetSpace.id}`)
-        .removeClass(`owner${currPlayer === 'white' ? 'black' : 'white'} empty pawn knight queen king rook bishop`)
-        .addClass(`owner${currPlayer} king`).text('')
-      $(`<img src=${image} />`).appendTo($(`#${targetSpace.id}`))
-      clickState = false;
-      clickedId = ''
-      currentPlayer = currPlayer === 'white' ? 'black' :'white'
+      const image = currentPlayer === 'black' ? images.blackking : images.whiteking;
+      if (!checkCheck) {
+        $(`#${clickedId}`).text(clickedId).removeClass(`owner${currentPlayer} king clicked`).addClass('empty')
+        $(`#${clickedId}`).empty()
+        $(`#${targetSpace.id}`)
+          .removeClass(`owner${currentPlayer === 'white' ? 'black' : 'white'} empty pawn knight queen king rook bishop`)
+          .addClass(`owner${currentPlayer} king`).text('')
+        $(`<img src=${image} />`).appendTo($(`#${targetSpace.id}`))
+        checkChecker('king', targetId);
+
+        clickState = false;
+        clickedId = ''
+        currentPlayer = swapCurrentPlayer();
+      } else {
+        if (currentPlayer === 'white') inCheckBlack = true;
+        if (currentPlayer === 'black') inCheckWhite = true;
+        return { inCheckBlack, inCheckWhite }
+      }
     }
   }
-  const rookValid = (currPlayer, clickedId, targetSpace, piece) => {
+  const rookValid = (clickedId, targetSpace, checkCheck = false, piece) => {
     let currentSpace = clickedId.split('')
     let targetedSpace = targetSpace
     const targetId = targetedSpace.id.split('')
     if (currentSpace[0] !== targetId[0] && currentSpace[1] !== targetId[1]) {
-      alert('invalid move')
+      if (!checkCheck) alert('invalid move')
       return;
     }
-    const pass = noBlockersRook(currentSpace, targetId)
+    const pass = noBlockersRook(currentSpace, targetId, checkCheck)
     if (pass) {
       let image;
       if (piece === 'rook') {
-        image = currPlayer === 'black' ? images.blackrook : images.whiterook;
+        image = currentPlayer === 'black' ? images.blackrook : images.whiterook;
       } if (piece === 'queen') {
-        image = currPlayer === 'black' ? images.blackqueen : images.whitequeen;
+        image = currentPlayer === 'black' ? images.blackqueen : images.whitequeen;
       }
-      $(`#${clickedId}`).text(clickedId).removeClass(`owner${currPlayer} ${piece} clicked`).addClass('empty')
-      $(`#${clickedId}`).empty()
-      $(`#${targetSpace.id}`)
-        .removeClass(`owner${currPlayer === 'white' ? 'black' : 'white'} empty pawn knight queen king rook bishop`)
-        .addClass(`owner${currPlayer} ${piece}`).text('')
-      $(`<img src=${image} />`).appendTo($(`#${targetSpace.id}`))
-      clickState = false;
-      clickedId = ''
-      currentPlayer = currPlayer === 'white' ? 'black' :'white'
+      if (!checkCheck) {
+        $(`#${clickedId}`).text(clickedId).removeClass(`owner${currentPlayer} ${piece} clicked`).addClass('empty')
+        $(`#${clickedId}`).empty()
+        $(`#${targetSpace.id}`)
+          .removeClass(`owner${currentPlayer === 'white' ? 'black' : 'white'} empty pawn knight queen king rook bishop`)
+          .addClass(`owner${currentPlayer} ${piece}`).text('')
+        $(`<img src=${image} />`).appendTo($(`#${targetSpace.id}`))
+        checkChecker('rook', targetId);
+
+        clickState = false;
+        clickedId = ''
+        currentPlayer = swapCurrentPlayer();
+      } else {
+        if (currentPlayer === 'white') inCheckBlack = true;
+        if (currentPlayer === 'black') inCheckWhite = true;
+        return { inCheckBlack, inCheckWhite }
+
+      }
     } else {
-      alert('invalid move')
+      if (!checkCheck) alert('invalid move')
       return
     }
   }
-  const noBlockersRook = (currentSpace, targetId) => {
+  const noBlockersRook = (currentSpace, targetId, checkCheck) => {
     const startLetter = currentSpace[0];
     const startLetterIndex = reverseLetter.indexOf(startLetter);
     const endLetter = targetId[0];
@@ -291,47 +317,56 @@ $(document).ready(() => {
     }
     return validMove
   }
-  const bishopValid = (currPlayer, clickedId, targetSpace, piece) => {
+  const bishopValid = (clickedId, targetSpace, checkCheck = false, piece) => {
     let currentSpace = clickedId.split('')
     let targetedSpace = targetSpace
     const targetId = targetedSpace.id.split('')
-    const value = bishopChecker(currPlayer, clickedId, targetSpace);
+    const value = bishopChecker(clickedId, targetSpace, checkCheck);
     if (value) {
       let image;
       if (piece === 'bishop') {
-        image = currPlayer === 'black' ? images.blackbishop : images.whitebishop;
+        image = currentPlayer === 'black' ? images.blackbishop : images.whitebishop;
       } if (piece === 'queen') {
-        image = currPlayer === 'black' ? images.blackqueen : images.whitequeen;
+        image = currentPlayer === 'black' ? images.blackqueen : images.whitequeen;
       }
-      $(`#${clickedId}`).text(clickedId).removeClass(`owner${currPlayer} ${piece} clicked`).addClass('empty')
-      $(`#${clickedId}`).empty()
-      $(`#${targetSpace.id}`)
-        .removeClass(`owner${currPlayer === 'white' ? 'black' : 'white'} empty pawn knight queen king rook bishop`)
-        .addClass(`owner${currPlayer} ${piece}`).text('')
-      $(`<img src=${image} />`).appendTo($(`#${targetSpace.id}`))
-      clickState = false;
-      clickedId = ''
-      currentPlayer = currPlayer === 'white' ? 'black' :'white'
+      if (!checkCheck) {
+        $(`#${clickedId}`).text(clickedId).removeClass(`owner${currentPlayer} ${piece} clicked`).addClass('empty')
+        $(`#${clickedId}`).empty()
+        $(`#${targetSpace.id}`)
+          .removeClass(`owner${currentPlayer === 'white' ? 'black' : 'white'} empty pawn knight queen king rook bishop`)
+          .addClass(`owner${currentPlayer} ${piece}`).text('')
+        $(`<img src=${image} />`).appendTo($(`#${targetSpace.id}`))
+        checkChecker('bishop', targetId);
+
+        clickState = false;
+        clickedId = ''
+        currentPlayer = swapCurrentPlayer();
+      } else {
+        if (currentPlayer === 'white') inCheckBlack = true;
+        if (currentPlayer === 'black') inCheckWhite = true;
+        return { inCheckBlack, inCheckWhite }
+
+      }
     }
   }
-  const bishopChecker = (currPlayer, clickedId, targetSpace) => {
+  const bishopChecker = (clickedId, targetSpace, checkCheck = false) => {
     let currentSpace = clickedId.split('')
     let targetedSpace = targetSpace
     const targetId = targetedSpace.id.split('')
     if (currentSpace[0] === targetId[0] || currentSpace[1] === targetId[1]) {
-      alert('invalid move')
+      if (!checkCheck) alert('invalid move')
       return;
     }
     if (Math.abs(
       reverseLetter.indexOf(currentSpace[0]) - reverseLetter.indexOf(targetId[0])) !==
       Math.abs(parseInt(currentSpace[1]) - parseInt(targetId[1]))) {
-        alert('invalid move')
+        if (!checkCheck) alert('invalid move')
         return;
     }
     let pass = noBlockersBishop(currentSpace, targetId)
     if (!pass) {
-      alert('invalid move')
-      return
+      if (!checkCheck) alert('invalid move')
+      return;
     }
     return true;
   }
@@ -374,30 +409,73 @@ $(document).ready(() => {
     }
     return validMove
   }
-  const queenValid = (currPlayer, clickedId, targetSpace, piece) => {
+  const queenValid = (clickedId, targetSpace, checkCheck = false, piece) => {
     let currentSpace = clickedId.split('')
     let targetedSpace = targetSpace
     const targetId = targetedSpace.id.split('')
     if (currentSpace[0] === targetId[0] || currentSpace[1] === targetId[1]) {
-      rookValid(currPlayer, clickedId, targetSpace, 'queen')
+      rookValid(clickedId, targetSpace, false, 'queen')
     } else {
-      bishopValid(currPlayer, clickedId, targetSpace, 'queen')
+      bishopValid(clickedId, targetSpace, false, 'queen')
     }
   }
-  const isValidMove = (piece, currPlayer, clickedId, targetSpace) => {
+  const knightValid = (clickedId, targetSpace, checkCheck = false) => {
+    const piece = 'knight'
+    let currentSpace = clickedId.split('')
+    let targetedSpace = targetSpace
+    const targetId = targetedSpace.id.split('')
+    const image = currentPlayer === 'black' ? images.blackknight : images.whiteknight;
+    if (Math.abs(parseInt(currentSpace[1]) - parseInt(targetId[1])) > 2
+      || Math.abs(reverseLetter.indexOf(currentSpace[0]) - reverseLetter.indexOf(targetId[0]) > 2)) {
+        if (!checkCheck) alert('invalid move')
+      return;
+    }
+    if (Math.abs(Math.abs(parseInt(currentSpace[1]) - parseInt(targetId[1]))
+      - Math.abs(reverseLetter.indexOf(currentSpace[0]) - reverseLetter.indexOf(targetId[0]))) !== 1) {
+        if (!checkCheck) alert('invalid move')
+      return;
+    }
+    if (!checkCheck) {
+      $(`#${clickedId}`).text(clickedId).removeClass(`owner${currentPlayer} ${piece} clicked`).addClass('empty')
+      $(`#${clickedId}`).empty()
+      $(`#${targetSpace.id}`)
+        .removeClass(`owner${currentPlayer === 'white' ? 'black' : 'white'} empty pawn knight queen king rook bishop`)
+        .addClass(`owner${currentPlayer} ${piece}`).text('')
+      $(`<img src=${image} />`).appendTo($(`#${targetSpace.id}`))
+      checkChecker('knight', targetId);
+
+      clickState = false;
+      clickedId = ''
+      currentPlayer = swapCurrentPlayer();
+    } else {
+      if (currentPlayer === 'white') inCheckBlack = true;
+      if (currentPlayer === 'black') inCheckWhite = true;
+      return { inCheckBlack, inCheckWhite }
+
+    }
+  }
+  const isValidMove = (piece, clickedId, targetSpace, checkCheck) => {
     if (targetSpace.className.indexOf(`owner${currentPlayer}`) > -1) {
-      alert('invalid move')
-      return
+      if (!checkCheck) alert('invalid move')
+      return;
     }
     const functionByPiece = {
-      pawn: () => (pawnValid(currPlayer, clickedId, targetSpace)),
-      rook: () => (rookValid(currPlayer, clickedId, targetSpace, 'rook')),
-      bishop: () => (bishopValid(currPlayer, clickedId, targetSpace, 'bishop')),
-      // knight: knightValid(currPlayer, clickedId, targetSpace),
-      queen: () => (queenValid(currPlayer, clickedId, targetSpace, 'queen')),
-      king: () => (kingValid(currPlayer, clickedId, targetSpace)),
+      pawn: () => (pawnValid(clickedId, targetSpace, checkCheck)),
+      rook: () => (rookValid(clickedId, targetSpace, checkCheck, 'rook')),
+      bishop: () => (bishopValid(clickedId, targetSpace, checkCheck, 'bishop')),
+      knight: () => (knightValid(clickedId, targetSpace, checkCheck)),
+      queen: () => (queenValid(clickedId, targetSpace, checkCheck, 'queen')),
+      king: () => (kingValid(clickedId, targetSpace, checkCheck)),
     }
-    functionByPiece[piece]()
+    return functionByPiece[piece]()
   };
+  const swapCurrentPlayer = () => {
+    return currentPlayer === 'white' ? 'black' : 'white';
+  }
+  const checkChecker = (piece, currentSpace) => {
+    const opposingPlayer = swapCurrentPlayer();
+    const enemyKing = $(`.owner${opposingPlayer}.king`)[0]
+    console.log(isValidMove(piece, currentSpace.join(''), enemyKing, true));
+  }
   boardSetup();
 });
