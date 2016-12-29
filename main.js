@@ -141,8 +141,13 @@ $(document).ready(() => {
     let targetedSpace = targetSpace
     const targetId = targetedSpace.id.split('')
     if (Math.abs(parseInt(currentSpace[1]) - parseInt(targetId[1])) !== 1) {
-      if (!checkCheck) alert('invalid move')
-      return;
+      if ((currentPlayer === 'white' && currentSpace[1] == "7" && (Math.abs(parseInt(currentSpace[1]) - parseInt(targetId[1])) === 2))
+         || (currentPlayer === 'black' && currentSpace[1] == "2" && (Math.abs(parseInt(currentSpace[1]) - parseInt(targetId[1])) === 2))) {
+
+      } else {
+        if (!checkCheck) alert('invalid move')
+        return;
+      }
     }
     if (Math.abs(parseInt(currentSpace[1]) - parseInt(targetId[1])) === 1
       && Math.abs(reverseLetter.indexOf(currentSpace[0]) - reverseLetter.indexOf(targetId[0])) > 1) {
